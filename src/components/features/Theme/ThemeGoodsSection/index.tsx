@@ -1,16 +1,40 @@
 import styled from '@emotion/styled';
+import { useEffect, useState } from 'react';
 
+import apiClient from '@/api';
+import { API } from '@/api/constants/apiPath';
 import { DefaultGoodsItems } from '@/components/common/GoodsItem/Default';
 import { Container } from '@/components/common/layouts/Container';
 import { Grid } from '@/components/common/layouts/Grid';
 import { breakpoints } from '@/styles/variants';
-import { GoodsMockList } from '@/types/mock';
+import type { GetGoodsDataResponse, GoodsData } from '@/types';
 
 type Props = {
   themeKey: string;
 };
 
-export const ThemeGoodsSection = ({}: Props) => {
+export const ThemeGoodsSection = ({ themeKey }: Props) => {
+  const [goodsList, setGoodsList] = useState<GoodsData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => {
+    const fetchGoodsList = async () => {
+      try {
+        const res = await apiClient.get<GetGoodsDataResponse>(API.THEME_PRODUCTS(themeKey), {});
+        console.log(res.data.products);
+        setGoodsList(res.data.products);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchGoodsList();
+  }, [themeKey]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <Wrapper>
       <Container>
@@ -21,7 +45,7 @@ export const ThemeGoodsSection = ({}: Props) => {
           }}
           gap={16}
         >
-          {GoodsMockList.map(({ id, imageURL, name, price, brandInfo }) => (
+          {goodsList.map(({ id, imageURL, name, price, brandInfo }) => (
             <DefaultGoodsItems
               key={id}
               imageSrc={imageURL}
