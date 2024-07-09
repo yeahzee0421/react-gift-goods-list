@@ -22,14 +22,16 @@ export const GoodsRankingSection = () => {
   useEffect(() => {
     const fetchGoodsList = async () => {
       try {
-        const res = await apiClient.get<GetGoodsDataResponse>(API.RANKING);
+        const res = await apiClient.get<GetGoodsDataResponse>(
+          `${API.RANKING}?targetType=${filterOption.targetType}&rankType=${filterOption.rankType}`,
+        );
         setGoodsList(res.data.products);
       } catch (error) {
         console.error(error);
       }
     };
     fetchGoodsList();
-  }, []);
+  }, [filterOption]);
 
   return (
     <Wrapper>
