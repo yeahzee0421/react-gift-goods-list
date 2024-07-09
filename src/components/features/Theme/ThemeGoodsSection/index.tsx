@@ -19,7 +19,11 @@ export const ThemeGoodsSection = ({ themeKey }: Props) => {
   useEffect(() => {
     const fetchGoodsList = async () => {
       try {
-        const res = await apiClient.get<GetGoodsDataResponse>(API.THEME_PRODUCTS(themeKey), {});
+        const res = await apiClient.get<GetGoodsDataResponse>(API.THEME_PRODUCTS(themeKey), {
+          params: {
+            maxResults: 20,
+          },
+        });
         console.log(res.data.products);
         setGoodsList(res.data.products);
       } catch (error) {
