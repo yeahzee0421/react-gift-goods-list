@@ -42,6 +42,7 @@ module.exports = {
     ],
     'import/extensions': ['off'],
     'import/no-extraneous-dependencies': ['off'],
+    ' eslint-disable-next-line react-hooks/exhaustive-deps': 'off',
     'react/jsx-filename-extension': [
       'warn',
       {
