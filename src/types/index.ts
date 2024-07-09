@@ -39,6 +39,9 @@ export type GoodsData = {
   };
 };
 
+export type GetThemeDataResponse = {
+  themes: ThemeData[];
+};
 //Response
 export type GetThemeListResponse = {
   themes: ThemeList[];
