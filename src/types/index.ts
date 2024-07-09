@@ -43,3 +43,7 @@ export type GoodsData = {
 export type GetThemeListResponse = {
   themes: ThemeList[];
 };
+
+export type GetGoodsDataResponse = {
+  products: GoodsData[];
+};
