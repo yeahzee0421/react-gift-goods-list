@@ -1,19 +1,47 @@
 import styled from '@emotion/styled';
+import { useEffect, useState } from 'react';
+import { Navigate } from 'react-router-dom';
 
+import apiClient from '@/api';
+import { API } from '@/api/constants/apiPath';
 import { Container } from '@/components/common/layouts/Container';
+import { RouterPath } from '@/routes/path';
 import { breakpoints } from '@/styles/variants';
-import type { ThemeData } from '@/types';
-import { ThemeMockList } from '@/types/mock';
+import type { GetThemeDataResponse } from '@/types';
+import { type ThemeData } from '@/types';
 
 type Props = {
   themeKey: string;
 };
 
 export const ThemeHeroSection = ({ themeKey }: Props) => {
-  const currentTheme = getCurrentTheme(themeKey, ThemeMockList);
+  const [currentTheme, setCurrentTheme] = useState<ThemeData>();
+  const [isLoading, setIsLoading] = useState(true);
 
+  useEffect(() => {
+    const fetchThemeData = async () => {
+      try {
+        const res = await apiClient.get<GetThemeDataResponse>(API.THEMES);
+        const theme = getCurrentTheme(themeKey, res.data.themes);
+        setCurrentTheme(theme);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchThemeData();
+  }, [themeKey]);
+
+  // 로딩 중일 때 표시
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  //메인 페이지로 연결
   if (!currentTheme) {
-    return null;
+    return <Navigate to={RouterPath.home} />;
   }
 
   const { backgroundColor, label, title, description } = currentTheme;

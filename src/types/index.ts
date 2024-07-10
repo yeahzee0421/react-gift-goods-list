@@ -7,6 +7,13 @@ export type ThemeData = {
   backgroundColor: string;
 };
 
+export type ThemeList = {
+  id: number;
+  key: string;
+  label: string;
+  imageURL: string;
+};
+
 export type RankingFilterOption = {
   targetType: 'ALL' | 'FEMALE' | 'MALE' | 'TEEN';
   rankType: 'MANY_WISH' | 'MANY_RECEIVE' | 'MANY_WISH_RECEIVE';
@@ -30,4 +37,16 @@ export type GoodsData = {
     name: string;
     imageURL: string;
   };
+};
+
+export type GetThemeDataResponse = {
+  themes: ThemeData[];
+};
+//Response
+export type GetThemeListResponse = {
+  themes: ThemeList[];
+};
+
+export type GetGoodsDataResponse = {
+  products: GoodsData[];
 };
