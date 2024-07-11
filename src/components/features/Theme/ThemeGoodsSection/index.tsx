@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 
-import apiClient from '@/api';
 import { API_ENDPOINT } from '@/api/constants/apiPath';
+import { fetchData } from '@/api/fetchData';
 import { DefaultGoodsItems } from '@/components/common/GoodsItem/Default';
 import { Container } from '@/components/common/layouts/Container';
 import { Grid } from '@/components/common/layouts/Grid';
@@ -15,32 +15,27 @@ type Props = {
 
 export const ThemeGoodsSection = ({ themeKey }: Props) => {
   const [goodsList, setGoodsList] = useState<GoodsData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
+    const params = {
+      maxResults: 20,
+    };
     const fetchGoodsList = async () => {
       try {
-        const res = await apiClient.get<GetGoodsDataResponse>(
+        const res = await fetchData<GetGoodsDataResponse>(
           API_ENDPOINT.THEME_PRODUCTS(themeKey),
-          {
-            params: {
-              maxResults: 20,
-            },
-          },
+          params,
         );
-        console.log(res.data.products);
-        setGoodsList(res.data.products);
+        if (res) {
+          console.log(res);
+          setGoodsList(res.products);
+        }
       } catch (error) {
         console.error(error);
-      } finally {
-        setIsLoading(false);
       }
     };
     fetchGoodsList();
   }, [themeKey]);
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <Wrapper>

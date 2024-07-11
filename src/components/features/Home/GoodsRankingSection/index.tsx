@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 
-import apiClient from '@/api';
 import { API_ENDPOINT } from '@/api/constants/apiPath';
+import { fetchData } from '@/api/fetchData';
 import { Container } from '@/components/common/layouts/Container';
 import { breakpoints } from '@/styles/variants';
 import type { GetGoodsDataResponse } from '@/types';
@@ -20,15 +20,16 @@ export const GoodsRankingSection = () => {
   const [goodsList, setGoodsList] = useState<GoodsData[]>([]);
 
   useEffect(() => {
+    const params = {
+      targetType: filterOption.targetType,
+      rankType: filterOption.rankType,
+    };
     const fetchGoodsList = async () => {
       try {
-        const res = await apiClient.get<GetGoodsDataResponse>(API_ENDPOINT.RANKING, {
-          params: {
-            targetType: filterOption.targetType,
-            rankType: filterOption.rankType,
-          },
-        });
-        setGoodsList(res.data.products);
+        const res = await fetchData<GetGoodsDataResponse>(API_ENDPOINT.RANKING, params);
+        if (res) {
+          setGoodsList(res.products);
+        }
       } catch (error) {
         console.error(error);
       }

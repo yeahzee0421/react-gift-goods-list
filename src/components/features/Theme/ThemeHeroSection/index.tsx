@@ -2,8 +2,8 @@ import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
-import apiClient from '@/api';
 import { API_ENDPOINT } from '@/api/constants/apiPath';
+import { fetchData } from '@/api/fetchData';
 import { Container } from '@/components/common/layouts/Container';
 import { RouterPath } from '@/routes/path';
 import { breakpoints } from '@/styles/variants';
@@ -21,22 +21,22 @@ export const ThemeHeroSection = ({ themeKey }: Props) => {
   useEffect(() => {
     const fetchThemeData = async () => {
       try {
-        const res = await apiClient.get<GetThemeDataResponse>(API_ENDPOINT.THEMES);
-        const theme = getCurrentTheme(themeKey, res.data.themes);
-        setCurrentTheme(theme);
+        const res = await fetchData<GetThemeDataResponse>(API_ENDPOINT.THEMES);
+        if (res) {
+          const theme = getCurrentTheme(themeKey, res.themes);
+          setCurrentTheme(theme);
+          setIsLoading(false);
+        }
       } catch (error) {
         console.error(error);
-      } finally {
-        setIsLoading(false);
       }
     };
 
     fetchThemeData();
   }, [themeKey]);
 
-  // 로딩 중일 때 표시
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div>로딩 중..</div>;
   }
 
   //메인 페이지로 연결
