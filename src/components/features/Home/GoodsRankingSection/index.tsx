@@ -34,21 +34,14 @@ export const GoodsRankingSection = () => {
       try {
         const res = await fetchData<GetGoodsDataResponse>(API_ENDPOINT.RANKING, params);
         if (res) {
-          setGoodsList(res.products);
+          const fetchedData = res.products;
+          setFetchState({
+            isLoading: false,
+            isError: false,
+            isDataNull: fetchedData.length === 0,
+            data: fetchedData,
+          });
         }
-        const res = await apiClient.get<GetGoodsDataResponse>(API.RANKING, {
-          params: {
-            targetType: filterOption.targetType,
-            rankType: filterOption.rankType,
-          },
-        });
-        const fetchedData = res.data.products;
-        setFetchState({
-          isLoading: false,
-          isError: false,
-          isDataNull: fetchedData.length === 0,
-          data: fetchedData,
-        });
       } catch (error) {
         console.error(error);
         setFetchState({

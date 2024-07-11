@@ -29,7 +29,6 @@ export const ThemeGoodsSection = ({ themeKey }: Props) => {
         if (res) {
           console.log(res);
           setGoodsList(res.products);
-          setIsLoading(false);
         }
       } catch (error) {
         console.error(error);
