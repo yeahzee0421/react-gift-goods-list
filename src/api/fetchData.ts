@@ -1,5 +1,5 @@
 import apiClient from '.';
-
+//Promise
 export const fetchData = async <T>(
   apiEndpoint: string,
   params?: object,
