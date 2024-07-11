@@ -2,8 +2,8 @@ import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import apiClient from '@/api';
-import { API } from '@/api/constants/apiPath';
+import { API_ENDPOINT } from '@/api/constants/apiPath';
+import { fetchData } from '@/api/fetchData';
 import { Container } from '@/components/common/layouts/Container';
 import { Grid } from '@/components/common/layouts/Grid';
 import { getDynamicPath } from '@/routes/path';
@@ -15,11 +15,17 @@ import { ThemeCategoryItem } from './ThemeCategoryItem';
 export const ThemeCategorySection = () => {
   const [themeList, setThemeList] = useState<ThemeList[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     const fetchThemeList = async () => {
       try {
-        const res = await apiClient.get<GetThemeListResponse>(API.THEMES);
-        setThemeList(res.data.themes);
+        const res = await fetchData<GetThemeListResponse>(API_ENDPOINT.THEMES);
+        if (res) {
+          console.log(res);
+          setThemeList(res.themes);
+          setIsLoading(false);
+        }
       } catch (error) {
         console.error(error);
         setIsLoading(false);
