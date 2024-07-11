@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
 import apiClient from '@/api';
-import { API } from '@/api/constants/apiPath';
+import { API_ENDPOINT } from '@/api/constants/apiPath';
 import { Container } from '@/components/common/layouts/Container';
 import { RouterPath } from '@/routes/path';
 import { breakpoints } from '@/styles/variants';
@@ -21,7 +21,7 @@ export const ThemeHeroSection = ({ themeKey }: Props) => {
   useEffect(() => {
     const fetchThemeData = async () => {
       try {
-        const res = await apiClient.get<GetThemeDataResponse>(API.THEMES);
+        const res = await apiClient.get<GetThemeDataResponse>(API_ENDPOINT.THEMES);
         const theme = getCurrentTheme(themeKey, res.data.themes);
         setCurrentTheme(theme);
       } catch (error) {

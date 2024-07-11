@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 
 import apiClient from '@/api';
-import { API } from '@/api/constants/apiPath';
+import { API_ENDPOINT } from '@/api/constants/apiPath';
 import { DefaultGoodsItems } from '@/components/common/GoodsItem/Default';
 import { Container } from '@/components/common/layouts/Container';
 import { Grid } from '@/components/common/layouts/Grid';
@@ -19,11 +19,14 @@ export const ThemeGoodsSection = ({ themeKey }: Props) => {
   useEffect(() => {
     const fetchGoodsList = async () => {
       try {
-        const res = await apiClient.get<GetGoodsDataResponse>(API.THEME_PRODUCTS(themeKey), {
-          params: {
-            maxResults: 20,
+        const res = await apiClient.get<GetGoodsDataResponse>(
+          API_ENDPOINT.THEME_PRODUCTS(themeKey),
+          {
+            params: {
+              maxResults: 20,
+            },
           },
-        });
+        );
         console.log(res.data.products);
         setGoodsList(res.data.products);
       } catch (error) {

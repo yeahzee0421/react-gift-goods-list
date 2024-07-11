@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import apiClient from '@/api';
-import { API } from '@/api/constants/apiPath';
+import { API_ENDPOINT } from '@/api/constants/apiPath';
 import { Container } from '@/components/common/layouts/Container';
 import { Grid } from '@/components/common/layouts/Grid';
 import { getDynamicPath } from '@/routes/path';
@@ -17,7 +17,7 @@ export const ThemeCategorySection = () => {
   useEffect(() => {
     const fetchThemeList = async () => {
       try {
-        const res = await apiClient.get<GetThemeListResponse>(API.THEMES);
+        const res = await apiClient.get<GetThemeListResponse>(API_ENDPOINT.THEMES);
         setThemeList(res.data.themes);
       } catch (error) {
         console.error(error);
