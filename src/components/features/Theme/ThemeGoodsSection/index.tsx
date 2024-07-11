@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { API_ENDPOINT } from '@/api/constants/apiPath';
 import { fetchData } from '@/api/fetchData';
+import type { FetchState } from '@/api/types/fetchState';
 import { DefaultGoodsItems } from '@/components/common/GoodsItem/Default';
 import { Container } from '@/components/common/layouts/Container';
 import { Grid } from '@/components/common/layouts/Grid';
@@ -14,7 +15,12 @@ type Props = {
 };
 
 export const ThemeGoodsSection = ({ themeKey }: Props) => {
-  const [goodsList, setGoodsList] = useState<GoodsData[]>([]);
+  const [fetchState, setFetchState] = useState<FetchState<GoodsData[]>>({
+    isLoading: true,
+    isError: false,
+    isDataNull: false,
+    data: null,
+  });
 
   useEffect(() => {
     const params = {
@@ -27,15 +33,38 @@ export const ThemeGoodsSection = ({ themeKey }: Props) => {
           params,
         );
         if (res) {
-          console.log(res);
-          setGoodsList(res.products);
+          const fetchedData = res.products;
+          setFetchState({
+            isLoading: false,
+            isError: false,
+            isDataNull: fetchData.length === 0,
+            data: fetchedData,
+          });
         }
       } catch (error) {
         console.error(error);
+        setFetchState({
+          isLoading: false,
+          isError: true,
+          isDataNull: true,
+          data: null,
+        });
       }
     };
     fetchGoodsList();
   }, [themeKey]);
+
+  if (fetchState.isLoading) {
+    return <div>로딩 중...</div>;
+  }
+
+  if (fetchState.isError) {
+    return <div>테마 상품 목록을 불러오지 못했습니다.</div>;
+  }
+
+  if (fetchState.isDataNull) {
+    return <div>테마 상품 목록이 비어있습니다.</div>;
+  }
 
   return (
     <Wrapper>
@@ -47,7 +76,7 @@ export const ThemeGoodsSection = ({ themeKey }: Props) => {
           }}
           gap={16}
         >
-          {goodsList.map(({ id, imageURL, name, price, brandInfo }) => (
+          {fetchState.data?.map(({ id, imageURL, name, price, brandInfo }) => (
             <DefaultGoodsItems
               key={id}
               imageSrc={imageURL}

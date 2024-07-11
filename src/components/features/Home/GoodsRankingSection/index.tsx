@@ -3,11 +3,11 @@ import { useEffect, useState } from 'react';
 
 import { API_ENDPOINT } from '@/api/constants/apiPath';
 import { fetchData } from '@/api/fetchData';
+import type { FetchState } from '@/api/types/fetchState';
 import { Container } from '@/components/common/layouts/Container';
 import { breakpoints } from '@/styles/variants';
 import type { GetGoodsDataResponse } from '@/types';
 import { type GoodsData, type RankingFilterOption } from '@/types';
-import type { FetchState } from '@/types/fetchState';
 
 import { GoodsRankingFilter } from './Filter';
 import { GoodsRankingList } from './List';
@@ -55,28 +55,24 @@ export const GoodsRankingSection = () => {
     fetchGoodsList();
   }, [filterOption]);
 
-  const renderGoodsList = () => {
-    if (fetchState.isLoading) {
-      return <div>로딩 중...</div>;
-    }
+  if (fetchState.isLoading) {
+    return <div>로딩 중...</div>;
+  }
 
-    if (fetchState.isError) {
-      return <div>상품 목록을 불러오지 못했습니다.</div>;
-    }
+  if (fetchState.isError) {
+    return <div>상품 목록을 불러오지 못했습니다.</div>;
+  }
 
-    if (fetchState.isDataNull || fetchState.data === null) {
-      return <div>상품 목록이 비어있습니다.</div>;
-    }
-
-    return <GoodsRankingList goodsList={fetchState.data} />;
-  };
+  if (fetchState.isDataNull || fetchState.data === null) {
+    return <div>상품 목록이 비어있습니다.</div>;
+  }
 
   return (
     <Wrapper>
       <Container>
         <Title>실시간 급상승 선물랭킹</Title>
         <GoodsRankingFilter filterOption={filterOption} onFilterOptionChange={setFilterOption} />
-        {renderGoodsList()}
+        <GoodsRankingList goodsList={fetchState.data} />;
       </Container>
     </Wrapper>
   );

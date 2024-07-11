@@ -4,6 +4,7 @@ import { Navigate } from 'react-router-dom';
 
 import { API_ENDPOINT } from '@/api/constants/apiPath';
 import { fetchData } from '@/api/fetchData';
+import type { FetchState } from '@/api/types/fetchState';
 import { Container } from '@/components/common/layouts/Container';
 import { RouterPath } from '@/routes/path';
 import { breakpoints } from '@/styles/variants';
@@ -15,8 +16,12 @@ type Props = {
 };
 
 export const ThemeHeroSection = ({ themeKey }: Props) => {
-  const [currentTheme, setCurrentTheme] = useState<ThemeData>();
-  const [isLoading, setIsLoading] = useState(true);
+  const [fetchState, setFetchState] = useState<FetchState<ThemeData>>({
+    isLoading: true,
+    isError: false,
+    isDataNull: false,
+    data: null,
+  });
 
   useEffect(() => {
     const fetchThemeData = async () => {
@@ -24,28 +29,44 @@ export const ThemeHeroSection = ({ themeKey }: Props) => {
         const res = await fetchData<GetThemeDataResponse>(API_ENDPOINT.THEMES);
         if (res) {
           const theme = getCurrentTheme(themeKey, res.themes);
-          setCurrentTheme(theme);
-          setIsLoading(false);
+          setFetchState({
+            isLoading: false,
+            isError: false,
+            isDataNull: theme === null,
+            data: theme || null,
+          });
         }
       } catch (error) {
         console.error(error);
+        setFetchState({
+          isLoading: false,
+          isError: true,
+          isDataNull: true,
+          data: null,
+        });
       }
     };
 
     fetchThemeData();
   }, [themeKey]);
 
-  if (isLoading) {
-    return <div>로딩 중..</div>;
+  if (fetchState.isLoading) {
+    return <div>로딩 중...</div>;
   }
 
-  //메인 페이지로 연결
-  if (!currentTheme) {
+  if (fetchState.isError) {
+    return <div>테마 섹션을 불러오지 못했습니다.</div>;
+  }
+
+  if (fetchState.isDataNull) {
+    return <div>테마 섹션이 비어있습니다.</div>;
+  }
+
+  if (!fetchState?.data?.key) {
     return <Navigate to={RouterPath.home} />;
   }
 
-  const { backgroundColor, label, title, description } = currentTheme;
-
+  const { backgroundColor, label, title, description } = fetchState.data;
   return (
     <Wrapper backgroundColor={backgroundColor}>
       <Container>
@@ -111,6 +132,6 @@ const Description = styled.p`
   }
 `;
 
-export const getCurrentTheme = (themeKey: string, themeList: ThemeData[]) => {
-  return themeList.find((theme) => theme.key === themeKey);
+export const getCurrentTheme = (themeKey: string, themeList: ThemeData[]): ThemeData | null => {
+  return themeList.find((theme) => theme.key === themeKey) || null;
 };
