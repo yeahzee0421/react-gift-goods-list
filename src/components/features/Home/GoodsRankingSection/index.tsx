@@ -7,6 +7,7 @@ import { Container } from '@/components/common/layouts/Container';
 import { breakpoints } from '@/styles/variants';
 import type { GetGoodsDataResponse } from '@/types';
 import { type GoodsData, type RankingFilterOption } from '@/types';
+import type { FetchState } from '@/types/fetchState';
 
 import { GoodsRankingFilter } from './Filter';
 import { GoodsRankingList } from './List';
@@ -17,7 +18,12 @@ export const GoodsRankingSection = () => {
     rankType: 'MANY_WISH',
   });
 
-  const [goodsList, setGoodsList] = useState<GoodsData[]>([]);
+  const [fetchState, setFetchState] = useState<FetchState<GoodsData[]>>({
+    isLoading: true,
+    isError: false,
+    isDataNull: false,
+    data: null,
+  });
 
   useEffect(() => {
     const fetchGoodsList = async () => {
@@ -28,20 +34,48 @@ export const GoodsRankingSection = () => {
             rankType: filterOption.rankType,
           },
         });
-        setGoodsList(res.data.products);
+        const fetchedData = res.data.products;
+        setFetchState({
+          isLoading: false,
+          isError: false,
+          isDataNull: fetchedData.length === 0,
+          data: fetchedData,
+        });
       } catch (error) {
         console.error(error);
+        setFetchState({
+          isLoading: false,
+          isError: true,
+          isDataNull: true,
+          data: null,
+        });
       }
     };
     fetchGoodsList();
   }, [filterOption]);
+
+  const renderGoodsList = () => {
+    if (fetchState.isLoading) {
+      return <div>로딩 중...</div>;
+    }
+
+    if (fetchState.isError) {
+      return <div>상품 목록을 불러오지 못했습니다.</div>;
+    }
+
+    if (fetchState.isDataNull || fetchState.data === null) {
+      return <div>상품 목록이 비어있습니다.</div>;
+    }
+
+    return <GoodsRankingList goodsList={fetchState.data} />;
+  };
 
   return (
     <Wrapper>
       <Container>
         <Title>실시간 급상승 선물랭킹</Title>
         <GoodsRankingFilter filterOption={filterOption} onFilterOptionChange={setFilterOption} />
-        <GoodsRankingList goodsList={goodsList} />
+        {renderGoodsList()}
       </Container>
     </Wrapper>
   );

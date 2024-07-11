@@ -14,6 +14,7 @@ import { ThemeCategoryItem } from './ThemeCategoryItem';
 
 export const ThemeCategorySection = () => {
   const [themeList, setThemeList] = useState<ThemeList[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     const fetchThemeList = async () => {
       try {
@@ -21,10 +22,16 @@ export const ThemeCategorySection = () => {
         setThemeList(res.data.themes);
       } catch (error) {
         console.error(error);
+        setIsLoading(false);
       }
     };
     fetchThemeList();
   }, []);
+
+  if (!isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <Wrapper>
       <Container>

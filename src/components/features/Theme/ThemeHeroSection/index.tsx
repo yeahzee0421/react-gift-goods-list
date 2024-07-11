@@ -24,6 +24,7 @@ export const ThemeHeroSection = ({ themeKey }: Props) => {
         const res = await apiClient.get<GetThemeDataResponse>(API.THEMES);
         const theme = getCurrentTheme(themeKey, res.data.themes);
         setCurrentTheme(theme);
+        setIsLoading(false);
       } catch (error) {
         console.error(error);
       } finally {
