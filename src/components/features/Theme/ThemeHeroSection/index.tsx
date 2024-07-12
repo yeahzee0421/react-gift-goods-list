@@ -29,7 +29,7 @@ export const ThemeHeroSection = ({ themeKey }: Props) => {
     const fetchThemeData = async () => {
       try {
         const res = await fetchData<GetThemeDataResponse>(API_ENDPOINT.THEMES);
-        if (res) {
+        if (res.ok) {
           const theme = getCurrentTheme(themeKey, res.data.themes);
           setFetchState({
             isLoading: false,

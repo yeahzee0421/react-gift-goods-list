@@ -34,7 +34,7 @@ export const ThemeGoodsSection = ({ themeKey }: Props) => {
           API_ENDPOINT.THEME_PRODUCTS(themeKey),
           params,
         );
-        if (res) {
+        if (res.ok) {
           const fetchedData = res.data.products;
           setFetchState({
             isLoading: false,

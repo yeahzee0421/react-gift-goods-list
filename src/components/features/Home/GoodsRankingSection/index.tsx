@@ -35,7 +35,7 @@ export const GoodsRankingSection = () => {
     const fetchGoodsList = async () => {
       try {
         const res = await fetchData<GetGoodsDataResponse>(API_ENDPOINT.RANKING, params);
-        if (res) {
+        if (res.ok) {
           const fetchedData = res.data.products;
           setFetchState({
             isLoading: false,
