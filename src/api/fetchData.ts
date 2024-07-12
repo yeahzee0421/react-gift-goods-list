@@ -1,6 +1,10 @@
 import apiClient from '.';
-//Promise
-export const fetchData = async <T>(apiEndpoint: string, params?: object): Promise<T> => {
+
+export const fetchData = async <T>(
+  apiEndpoint: string,
+  params?: object,
+): Promise<{ data: T; ok: boolean }> => {
   const res = await apiClient.get<T>(apiEndpoint, { params });
-  return res.data;
+  const ok = res.status === 200;
+  return { data: res.data, ok };
 };

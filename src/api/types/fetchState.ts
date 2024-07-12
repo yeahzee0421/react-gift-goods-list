@@ -3,4 +3,5 @@ export interface FetchState<T> {
   isError: boolean;
   isDataNull: boolean;
   data: T | null;
+  errorMessage: string | null;
 }

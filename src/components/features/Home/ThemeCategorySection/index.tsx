@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 
 import { API_ENDPOINT } from '@/api/constants/apiPath';
 import { fetchData } from '@/api/fetchData';
+import { getErrorMessage } from '@/api/getErrorMessage';
 import type { FetchState } from '@/api/types/fetchState';
 import { Container } from '@/components/common/layouts/Container';
 import { Grid } from '@/components/common/layouts/Grid';
@@ -19,28 +20,32 @@ export const ThemeCategorySection = () => {
     isError: false,
     isDataNull: false,
     data: null,
+    errorMessage: null,
   });
 
   useEffect(() => {
     const fetchThemeList = async () => {
       try {
         const res = await fetchData<GetThemeListResponse>(API_ENDPOINT.THEMES);
-        if (res) {
-          const fetchedData = res.themes;
+
+        if (res.ok) {
+          const fetchedData = res.data.themes;
           setFetchState({
             isLoading: false,
             isError: false,
             isDataNull: fetchedData.length === 0,
             data: fetchedData,
+            errorMessage: null,
           });
         }
       } catch (error) {
-        console.error(error);
+        console.error(getErrorMessage(error));
         setFetchState({
           isLoading: false,
           isError: true,
           isDataNull: true,
           data: null,
+          errorMessage: getErrorMessage(error),
         });
       }
     };

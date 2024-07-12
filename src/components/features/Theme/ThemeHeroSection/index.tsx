@@ -4,6 +4,7 @@ import { Navigate } from 'react-router-dom';
 
 import { API_ENDPOINT } from '@/api/constants/apiPath';
 import { fetchData } from '@/api/fetchData';
+import { getErrorMessage } from '@/api/getErrorMessage';
 import type { FetchState } from '@/api/types/fetchState';
 import { Container } from '@/components/common/layouts/Container';
 import { RouterPath } from '@/routes/path';
@@ -21,6 +22,7 @@ export const ThemeHeroSection = ({ themeKey }: Props) => {
     isError: false,
     isDataNull: false,
     data: null,
+    errorMessage: null,
   });
 
   useEffect(() => {
@@ -28,12 +30,13 @@ export const ThemeHeroSection = ({ themeKey }: Props) => {
       try {
         const res = await fetchData<GetThemeDataResponse>(API_ENDPOINT.THEMES);
         if (res) {
-          const theme = getCurrentTheme(themeKey, res.themes);
+          const theme = getCurrentTheme(themeKey, res.data.themes);
           setFetchState({
             isLoading: false,
             isError: false,
             isDataNull: theme === null,
             data: theme || null,
+            errorMessage: null,
           });
         }
       } catch (error) {
@@ -43,6 +46,7 @@ export const ThemeHeroSection = ({ themeKey }: Props) => {
           isError: true,
           isDataNull: true,
           data: null,
+          errorMessage: getErrorMessage(error),
         });
       }
     };

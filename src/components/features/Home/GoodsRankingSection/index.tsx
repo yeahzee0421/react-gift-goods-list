@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { API_ENDPOINT } from '@/api/constants/apiPath';
 import { fetchData } from '@/api/fetchData';
+import { getErrorMessage } from '@/api/getErrorMessage';
 import type { FetchState } from '@/api/types/fetchState';
 import { Container } from '@/components/common/layouts/Container';
 import { breakpoints } from '@/styles/variants';
@@ -23,6 +24,7 @@ export const GoodsRankingSection = () => {
     isError: false,
     isDataNull: false,
     data: null,
+    errorMessage: null,
   });
 
   useEffect(() => {
@@ -34,12 +36,13 @@ export const GoodsRankingSection = () => {
       try {
         const res = await fetchData<GetGoodsDataResponse>(API_ENDPOINT.RANKING, params);
         if (res) {
-          const fetchedData = res.products;
+          const fetchedData = res.data.products;
           setFetchState({
             isLoading: false,
             isError: false,
             isDataNull: fetchedData.length === 0,
             data: fetchedData,
+            errorMessage: null,
           });
         }
       } catch (error) {
@@ -49,6 +52,7 @@ export const GoodsRankingSection = () => {
           isError: true,
           isDataNull: true,
           data: null,
+          errorMessage: getErrorMessage(error),
         });
       }
     };
