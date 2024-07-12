@@ -63,7 +63,7 @@ export const ThemeCategorySection = () => {
   if (fetchState.isDataNull) {
     return <div>테마 목록이 비어있습니다.</div>;
   }
-
+  
   return (
     <Wrapper>
       <Container>
