@@ -40,7 +40,7 @@ export const GoodsRankingSection = () => {
           setFetchState({
             isLoading: false,
             isError: false,
-            isDataNull: fetchedData === null || fetchedData.length === 0,
+            isDataNull: fetchData === null,
             data: fetchedData,
             errorMessage: null,
           });
@@ -76,7 +76,7 @@ export const GoodsRankingSection = () => {
       <Container>
         <Title>실시간 급상승 선물랭킹</Title>
         <GoodsRankingFilter filterOption={filterOption} onFilterOptionChange={setFilterOption} />
-        {fetchState.data && <GoodsRankingList goodsList={fetchState.data as GoodsData[]} />}
+        <GoodsRankingList goodsList={fetchState.data as GoodsData[]} />
       </Container>
     </Wrapper>
   );
