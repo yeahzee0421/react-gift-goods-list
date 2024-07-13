@@ -22,7 +22,6 @@ export const GoodsRankingSection = () => {
   const [fetchState, setFetchState] = useState<FetchState<GoodsData[]>>({
     isLoading: true,
     isError: false,
-    isDataNull: false,
     data: null,
     errorMessage: null,
   });
@@ -40,7 +39,6 @@ export const GoodsRankingSection = () => {
           setFetchState({
             isLoading: false,
             isError: false,
-            isDataNull: fetchData === null,
             data: fetchedData,
             errorMessage: null,
           });
@@ -50,7 +48,6 @@ export const GoodsRankingSection = () => {
         setFetchState({
           isLoading: false,
           isError: true,
-          isDataNull: true,
           data: null,
           errorMessage: getErrorMessage(error),
         });
@@ -67,16 +64,18 @@ export const GoodsRankingSection = () => {
     return <div>상품 목록을 불러오지 못했습니다.</div>;
   }
 
-  if (fetchState.isDataNull) {
+  if (fetchState.data === null) {
     return <div>상품 목록이 비어있습니다.</div>;
   }
+
+  const goodsData: GoodsData[] = fetchState.data;
 
   return (
     <Wrapper>
       <Container>
         <Title>실시간 급상승 선물랭킹</Title>
         <GoodsRankingFilter filterOption={filterOption} onFilterOptionChange={setFilterOption} />
-        <GoodsRankingList goodsList={fetchState.data as GoodsData[]} />
+        <GoodsRankingList goodsList={goodsData} />
       </Container>
     </Wrapper>
   );
