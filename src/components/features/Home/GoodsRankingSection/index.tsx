@@ -1,17 +1,24 @@
 import styled from '@emotion/styled';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 
 import { API_ENDPOINT } from '@/api/constants/apiPath';
 import { fetchData } from '@/api/fetchData';
-import { getErrorMessage } from '@/api/getErrorMessage';
-import type { FetchState } from '@/api/types/fetchState';
 import { Container } from '@/components/common/layouts/Container';
 import { breakpoints } from '@/styles/variants';
-import type { GetGoodsDataResponse } from '@/types';
 import { type GoodsData, type RankingFilterOption } from '@/types';
 
 import { GoodsRankingFilter } from './Filter';
 import { GoodsRankingList } from './List';
+
+const fetchGoodsList = async (filterOption: RankingFilterOption) => {
+  const params = {
+    targetType: filterOption.targetType,
+    rankType: filterOption.rankType,
+  };
+  const { data } = await fetchData<GoodsData[]>(API_ENDPOINT.RANKING, params);
+  return data;
+};
 
 export const GoodsRankingSection = () => {
   const [filterOption, setFilterOption] = useState<RankingFilterOption>({
@@ -19,55 +26,18 @@ export const GoodsRankingSection = () => {
     rankType: 'MANY_WISH',
   });
 
-  const [fetchState, setFetchState] = useState<FetchState<GoodsData[]>>({
-    isLoading: true,
-    isError: false,
-    isDataNull: false,
-    data: null,
-    errorMessage: null,
+  const { data, error, isLoading } = useQuery<GoodsData[]>({
+    queryKey: ['goodsList', filterOption],
+    queryFn: () => fetchGoodsList(filterOption),
   });
 
-  useEffect(() => {
-    const params = {
-      targetType: filterOption.targetType,
-      rankType: filterOption.rankType,
-    };
-    const fetchGoodsList = async () => {
-      try {
-        const res = await fetchData<GetGoodsDataResponse>(API_ENDPOINT.RANKING, params);
-        if (res.ok) {
-          const fetchedData = res.data.products;
-          setFetchState({
-            isLoading: false,
-            isError: false,
-            isDataNull: fetchedData.length === 0,
-            data: fetchedData,
-            errorMessage: null,
-          });
-        }
-      } catch (error) {
-        console.error(error);
-        setFetchState({
-          isLoading: false,
-          isError: true,
-          isDataNull: true,
-          data: null,
-          errorMessage: getErrorMessage(error),
-        });
-      }
-    };
-    fetchGoodsList();
-  }, [filterOption]);
-
-  if (fetchState.isLoading) {
+  if (isLoading) {
     return <div>로딩 중...</div>;
   }
-
-  if (fetchState.isError) {
-    return <div>상품 목록을 불러오지 못했습니다.</div>;
+  if (error) {
+    return <div>상품 목록 로딩 에러</div>;
   }
-
-  if (fetchState.isDataNull || fetchState.data === null) {
+  if (!data) {
     return <div>상품 목록이 비어있습니다.</div>;
   }
 
@@ -76,7 +46,7 @@ export const GoodsRankingSection = () => {
       <Container>
         <Title>실시간 급상승 선물랭킹</Title>
         <GoodsRankingFilter filterOption={filterOption} onFilterOptionChange={setFilterOption} />
-        <GoodsRankingList goodsList={fetchState.data} />;
+        <GoodsRankingList goodsList={data} />;
       </Container>
     </Wrapper>
   );
