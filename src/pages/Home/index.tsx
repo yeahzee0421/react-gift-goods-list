@@ -1,4 +1,7 @@
+import { Suspense } from 'react';
+
 import { Spacing } from '@/components/common/layouts/Spacing';
+import { GoodsRankingListLoading, ThemeCategoryLoading } from '@/components/common/Loader';
 import { AiDiscoveryBanner } from '@/components/features/Home/AiDiscoveryBanner';
 import { GoodsRankingSection } from '@/components/features/Home/GoodsRankingSection';
 import { SelectFriendsBanner } from '@/components/features/Home/SelectFriendsBanner';
@@ -8,7 +11,9 @@ export const HomePage = () => {
   return (
     <>
       <SelectFriendsBanner />
-      <ThemeCategorySection />
+      <Suspense fallback={<ThemeCategoryLoading />}>
+        <ThemeCategorySection />
+      </Suspense>
       <AiDiscoveryBanner />
       <Spacing
         height={{
@@ -17,7 +22,9 @@ export const HomePage = () => {
           md: 120,
         }}
       />
-      <GoodsRankingSection />
+      <Suspense fallback={<GoodsRankingListLoading />}>
+        <GoodsRankingSection />
+      </Suspense>
     </>
   );
 };

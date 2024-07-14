@@ -1,11 +1,12 @@
 import styled from '@emotion/styled';
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import { API_ENDPOINT } from '@/api/constants/apiPath';
 import { fetchData } from '@/api/fetchData';
 import { Container } from '@/components/common/layouts/Container';
 import { breakpoints } from '@/styles/variants';
+import type { GetGoodsDataResponse } from '@/types';
 import { type GoodsData, type RankingFilterOption } from '@/types';
 
 import { GoodsRankingFilter } from './Filter';
@@ -16,8 +17,8 @@ const fetchGoodsList = async (filterOption: RankingFilterOption) => {
     targetType: filterOption.targetType,
     rankType: filterOption.rankType,
   };
-  const { data } = await fetchData<GoodsData[]>(API_ENDPOINT.RANKING, params);
-  return data;
+  const { data } = await fetchData<GetGoodsDataResponse>(API_ENDPOINT.RANKING, params);
+  return data.products;
 };
 
 export const GoodsRankingSection = () => {
@@ -26,20 +27,10 @@ export const GoodsRankingSection = () => {
     rankType: 'MANY_WISH',
   });
 
-  const { data, error, isLoading } = useQuery<GoodsData[]>({
+  const { data } = useSuspenseQuery<GoodsData[]>({
     queryKey: ['goodsList', filterOption],
     queryFn: () => fetchGoodsList(filterOption),
   });
-
-  if (isLoading) {
-    return <div>로딩 중...</div>;
-  }
-  if (error) {
-    return <div>상품 목록 로딩 에러</div>;
-  }
-  if (!data) {
-    return <div>상품 목록이 비어있습니다.</div>;
-  }
 
   return (
     <Wrapper>
