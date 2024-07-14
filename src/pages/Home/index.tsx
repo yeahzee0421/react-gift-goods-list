@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 
 import { Spacing } from '@/components/common/layouts/Spacing';
 import { GoodsRankingListLoading, ThemeCategoryLoading } from '@/components/common/Loader';
+import RetryErrorBoundary from '@/components/common/RetryErrorBoundary';
 import { AiDiscoveryBanner } from '@/components/features/Home/AiDiscoveryBanner';
 import { GoodsRankingSection } from '@/components/features/Home/GoodsRankingSection';
 import { SelectFriendsBanner } from '@/components/features/Home/SelectFriendsBanner';
@@ -11,9 +12,11 @@ export const HomePage = () => {
   return (
     <>
       <SelectFriendsBanner />
-      <Suspense fallback={<ThemeCategoryLoading />}>
-        <ThemeCategorySection />
-      </Suspense>
+      <RetryErrorBoundary>
+        <Suspense fallback={<ThemeCategoryLoading />}>
+          <ThemeCategorySection />
+        </Suspense>
+      </RetryErrorBoundary>
       <AiDiscoveryBanner />
       <Spacing
         height={{
@@ -22,9 +25,11 @@ export const HomePage = () => {
           md: 120,
         }}
       />
-      <Suspense fallback={<GoodsRankingListLoading />}>
-        <GoodsRankingSection />
-      </Suspense>
+      <RetryErrorBoundary>
+        <Suspense fallback={<GoodsRankingListLoading />}>
+          <GoodsRankingSection />
+        </Suspense>
+      </RetryErrorBoundary>
     </>
   );
 };
