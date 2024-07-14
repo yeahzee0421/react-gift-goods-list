@@ -1,8 +1,10 @@
 import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 
-import apiClient from '@/api';
-import { API } from '@/api/constants/apiPath';
+import { API_ENDPOINT } from '@/api/constants/apiPath';
+import { fetchData } from '@/api/fetchData';
+import { getErrorMessage } from '@/api/getErrorMessage';
+import type { FetchState } from '@/api/types/fetchState';
 import { Container } from '@/components/common/layouts/Container';
 import { breakpoints } from '@/styles/variants';
 import type { GetGoodsDataResponse } from '@/types';
@@ -17,31 +19,63 @@ export const GoodsRankingSection = () => {
     rankType: 'MANY_WISH',
   });
 
-  const [goodsList, setGoodsList] = useState<GoodsData[]>([]);
+  const [fetchState, setFetchState] = useState<FetchState<GoodsData[]>>({
+    isLoading: true,
+    isError: false,
+    data: null,
+    errorMessage: null,
+  });
 
   useEffect(() => {
+    const params = {
+      targetType: filterOption.targetType,
+      rankType: filterOption.rankType,
+    };
     const fetchGoodsList = async () => {
       try {
-        const res = await apiClient.get<GetGoodsDataResponse>(API.RANKING, {
-          params: {
-            targetType: filterOption.targetType,
-            rankType: filterOption.rankType,
-          },
-        });
-        setGoodsList(res.data.products);
+        const res = await fetchData<GetGoodsDataResponse>(API_ENDPOINT.RANKING, params);
+        if (res.ok) {
+          const fetchedData = res.data.products;
+          setFetchState({
+            isLoading: false,
+            isError: false,
+            data: fetchedData,
+            errorMessage: null,
+          });
+        }
       } catch (error) {
         console.error(error);
+        setFetchState({
+          isLoading: false,
+          isError: true,
+          data: null,
+          errorMessage: getErrorMessage(error),
+        });
       }
     };
     fetchGoodsList();
   }, [filterOption]);
+
+  if (fetchState.isLoading) {
+    return <div>로딩 중...</div>;
+  }
+
+  if (fetchState.isError) {
+    return <div>상품 목록을 불러오지 못했습니다.</div>;
+  }
+
+  if (fetchState.data === null) {
+    return <div>상품 목록이 비어있습니다.</div>;
+  }
+
+  const goodsData: GoodsData[] = fetchState.data;
 
   return (
     <Wrapper>
       <Container>
         <Title>실시간 급상승 선물랭킹</Title>
         <GoodsRankingFilter filterOption={filterOption} onFilterOptionChange={setFilterOption} />
-        <GoodsRankingList goodsList={goodsList} />
+        <GoodsRankingList goodsList={goodsData} />
       </Container>
     </Wrapper>
   );

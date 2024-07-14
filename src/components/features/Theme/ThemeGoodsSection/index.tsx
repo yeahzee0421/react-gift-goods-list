@@ -1,8 +1,10 @@
 import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 
-import apiClient from '@/api';
-import { API } from '@/api/constants/apiPath';
+import { API_ENDPOINT } from '@/api/constants/apiPath';
+import { fetchData } from '@/api/fetchData';
+import { getErrorMessage } from '@/api/getErrorMessage';
+import type { FetchState } from '@/api/types/fetchState';
 import { DefaultGoodsItems } from '@/components/common/GoodsItem/Default';
 import { Container } from '@/components/common/layouts/Container';
 import { Grid } from '@/components/common/layouts/Grid';
@@ -14,29 +16,58 @@ type Props = {
 };
 
 export const ThemeGoodsSection = ({ themeKey }: Props) => {
-  const [goodsList, setGoodsList] = useState<GoodsData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [fetchState, setFetchState] = useState<FetchState<GoodsData[]>>({
+    isLoading: true,
+    isError: false,
+    isDataNull: false,
+    data: null,
+    errorMessage: null,
+  });
+
   useEffect(() => {
+    const params = {
+      maxResults: 20,
+    };
     const fetchGoodsList = async () => {
       try {
-        const res = await apiClient.get<GetGoodsDataResponse>(API.THEME_PRODUCTS(themeKey), {
-          params: {
-            maxResults: 20,
-          },
-        });
-        console.log(res.data.products);
-        setGoodsList(res.data.products);
+        const res = await fetchData<GetGoodsDataResponse>(
+          API_ENDPOINT.THEME_PRODUCTS(themeKey),
+          params,
+        );
+        if (res.ok) {
+          const fetchedData = res.data.products;
+          setFetchState({
+            isLoading: false,
+            isError: false,
+            isDataNull: fetchData.length === 0,
+            data: fetchedData,
+            errorMessage: null,
+          });
+        }
       } catch (error) {
         console.error(error);
-      } finally {
-        setIsLoading(false);
+        setFetchState({
+          isLoading: false,
+          isError: true,
+          isDataNull: true,
+          data: null,
+          errorMessage: getErrorMessage(error),
+        });
       }
     };
     fetchGoodsList();
   }, [themeKey]);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
+  if (fetchState.isLoading) {
+    return <div>로딩 중...</div>;
+  }
+
+  if (fetchState.isError) {
+    return <div>테마 상품 목록을 불러오지 못했습니다.</div>;
+  }
+
+  if (fetchState.isDataNull) {
+    return <div>테마 상품 목록이 비어있습니다.</div>;
   }
 
   return (
@@ -49,7 +80,7 @@ export const ThemeGoodsSection = ({ themeKey }: Props) => {
           }}
           gap={16}
         >
-          {goodsList.map(({ id, imageURL, name, price, brandInfo }) => (
+          {fetchState.data?.map(({ id, imageURL, name, price, brandInfo }) => (
             <DefaultGoodsItems
               key={id}
               imageSrc={imageURL}
