@@ -31,6 +31,7 @@ export const ThemeHeroSection = ({ themeKey }: Props) => {
   }
 
   const { backgroundColor, label, title, description } = currentTheme;
+  
   return (
     <Wrapper backgroundColor={backgroundColor}>
       <Container>

@@ -35,6 +35,8 @@ npm run start
 
 ## Week3. STEP3 - 테마 별 선물 추천 API에 페이지네이션 구현하기
 
+### 📜Requirements
+
 - [x] React Query를 사용하여 API 구현
 - [x] Suspense, Error Boundary를 사용하여 에러, 로딩 상태 핸들링을 함.
 - [x] 페이지네이션과 무한스크롤 구현
