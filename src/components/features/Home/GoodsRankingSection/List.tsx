@@ -26,16 +26,21 @@ export const GoodsRankingList = ({ goodsList }: Props) => {
         }}
         gap={16}
       >
-        {currentGoodsList.map(({ id, imageURL, name, price, brandInfo }, index) => (
-          <RankingGoodsItems
-            key={id}
-            rankingIndex={index + 1}
-            imageSrc={imageURL}
-            title={name}
-            amount={price.sellingPrice}
-            subtitle={brandInfo.name}
-          />
-        ))}
+        {currentGoodsList.length > 0 ? (
+          currentGoodsList.map(({ id, imageURL, name, price, brandInfo }, index) => (
+            <RankingGoodsItems
+              key={id}
+              rankingIndex={index + 1}
+              imageSrc={imageURL}
+              title={name}
+              amount={price.sellingPrice}
+              subtitle={brandInfo.name}
+            />
+          ))
+        ) : (
+          //비어있을 때 보여질 문구(임시)
+          <EmptyMessage>비어있습니다.</EmptyMessage>
+        )}
       </Grid>
       <ButtonWrapper>
         <Button
@@ -66,4 +71,9 @@ const ButtonWrapper = styled.div`
   justify-content: center;
 
   padding-top: 30px;
+`;
+
+const EmptyMessage = styled.div`
+  text-align: center;
+  font-size: 18px;
 `;

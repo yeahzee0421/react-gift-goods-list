@@ -17,6 +17,7 @@ module.exports = {
     ecmaFeatures: {
       jsx: true,
     },
+    tsconfigRootDir: __dirname,
     ecmaVersion: 'latest',
     sourceType: 'module',
   },
@@ -42,6 +43,7 @@ module.exports = {
     ],
     'import/extensions': ['off'],
     'import/no-extraneous-dependencies': ['off'],
+    'react-hooks/exhaustive-deps': 'off',
     'react/jsx-filename-extension': [
       'warn',
       {

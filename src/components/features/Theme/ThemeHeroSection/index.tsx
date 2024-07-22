@@ -1,23 +1,37 @@
 import styled from '@emotion/styled';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { Navigate } from 'react-router-dom';
 
+import { API_ENDPOINT } from '@/api/constants/apiPath';
+import { fetchData } from '@/api/fetchData';
 import { Container } from '@/components/common/layouts/Container';
+import { RouterPath } from '@/routes/path';
 import { breakpoints } from '@/styles/variants';
-import type { ThemeData } from '@/types';
-import { ThemeMockList } from '@/types/mock';
+import type { GetThemeDataResponse } from '@/types';
+import { type ThemeData } from '@/types';
 
 type Props = {
   themeKey: string;
 };
 
-export const ThemeHeroSection = ({ themeKey }: Props) => {
-  const currentTheme = getCurrentTheme(themeKey, ThemeMockList);
+const fetchThemeData = async () => {
+  const { data } = await fetchData<GetThemeDataResponse>(API_ENDPOINT.THEMES);
+  return data.themes;
+};
 
-  if (!currentTheme) {
-    return null;
+export const ThemeHeroSection = ({ themeKey }: Props) => {
+  const { data } = useSuspenseQuery<ThemeData[]>({
+    queryKey: ['themeData'],
+    queryFn: () => fetchThemeData(),
+  });
+  const currentTheme = getCurrentTheme(themeKey, data);
+
+  if (!currentTheme?.key) {
+    return <Navigate to={RouterPath.home} />;
   }
 
   const { backgroundColor, label, title, description } = currentTheme;
-
+  
   return (
     <Wrapper backgroundColor={backgroundColor}>
       <Container>
@@ -83,6 +97,6 @@ const Description = styled.p`
   }
 `;
 
-export const getCurrentTheme = (themeKey: string, themeList: ThemeData[]) => {
-  return themeList.find((theme) => theme.key === themeKey);
+export const getCurrentTheme = (themeKey: string, themeList: ThemeData[]): ThemeData | null => {
+  return themeList.find((theme) => theme.key === themeKey) || null;
 };

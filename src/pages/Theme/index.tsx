@@ -1,22 +1,19 @@
-import { Navigate, useParams } from 'react-router-dom';
+import { Suspense } from 'react';
+import { useParams } from 'react-router-dom';
 
+import { ThemePageLoading } from '@/components/common/Loader';
+import RetryErrorBoundary from '@/components/common/RetryErrorBoundary';
 import { ThemeGoodsSection } from '@/components/features/Theme/ThemeGoodsSection';
-import { getCurrentTheme, ThemeHeroSection } from '@/components/features/Theme/ThemeHeroSection';
-import { RouterPath } from '@/routes/path';
-import { ThemeMockList } from '@/types/mock';
+import { ThemeHeroSection } from '@/components/features/Theme/ThemeHeroSection';
 
 export const ThemePage = () => {
   const { themeKey = '' } = useParams<{ themeKey: string }>();
-  const currentTheme = getCurrentTheme(themeKey, ThemeMockList);
-
-  if (!currentTheme) {
-    return <Navigate to={RouterPath.notFound} />;
-  }
-
   return (
-    <>
-      <ThemeHeroSection themeKey={themeKey} />
-      <ThemeGoodsSection themeKey={themeKey} />
-    </>
+    <RetryErrorBoundary>
+      <Suspense fallback={<ThemePageLoading />}>
+        <ThemeHeroSection themeKey={themeKey} />
+        <ThemeGoodsSection themeKey={themeKey} />
+      </Suspense>
+    </RetryErrorBoundary>
   );
 };

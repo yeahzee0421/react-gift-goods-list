@@ -1,13 +1,25 @@
 import styled from '@emotion/styled';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
+import { API_ENDPOINT } from '@/api/constants/apiPath';
+import { fetchData } from '@/api/fetchData';
 import { Container } from '@/components/common/layouts/Container';
 import { breakpoints } from '@/styles/variants';
-import type { RankingFilterOption } from '@/types';
-import { GoodsMockList } from '@/types/mock';
+import type { GetGoodsDataResponse } from '@/types';
+import { type GoodsData, type RankingFilterOption } from '@/types';
 
 import { GoodsRankingFilter } from './Filter';
 import { GoodsRankingList } from './List';
+
+const fetchGoodsList = async (filterOption: RankingFilterOption) => {
+  const params = {
+    targetType: filterOption.targetType,
+    rankType: filterOption.rankType,
+  };
+  const { data } = await fetchData<GetGoodsDataResponse>(API_ENDPOINT.RANKING, params);
+  return data.products;
+};
 
 export const GoodsRankingSection = () => {
   const [filterOption, setFilterOption] = useState<RankingFilterOption>({
@@ -15,14 +27,17 @@ export const GoodsRankingSection = () => {
     rankType: 'MANY_WISH',
   });
 
-  // GoodsMockData를 21번 반복 생성
+  const { data } = useSuspenseQuery<GoodsData[]>({
+    queryKey: ['goodsList', filterOption],
+    queryFn: () => fetchGoodsList(filterOption),
+  });
 
   return (
     <Wrapper>
       <Container>
         <Title>실시간 급상승 선물랭킹</Title>
         <GoodsRankingFilter filterOption={filterOption} onFilterOptionChange={setFilterOption} />
-        <GoodsRankingList goodsList={GoodsMockList} />
+        <GoodsRankingList goodsList={data} />;
       </Container>
     </Wrapper>
   );
